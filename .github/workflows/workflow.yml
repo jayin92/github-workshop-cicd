@@ -19,25 +19,27 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       - uses: montudor/action-zip@v1
   compile:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       # Runs a single command using the runners shell
       - name: Compile
         run: make clean && make
   test:
+    needs: compile
     runs-on: ubuntu-latest
     steps:
       # Runs a set of commands using the runners shell
       - name: Test
         run: make test
   zip:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Zip file
@@ -47,6 +49,7 @@ jobs:
             zip handin/$i.zip -qq -r $i/*.cpp;
           done
   commit:
+    needs: zip
     runs-on: ubuntu-latest
     permissions:
       contents: write
